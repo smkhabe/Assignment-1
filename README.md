@@ -9,7 +9,7 @@ A web-based insurance claim management system built with Flask that allows users
 - Risk Analysis
 - Report Generation
 - Data Persistence
-- Modern UI with Bootstrap 5
+
 
 ## Project Structure
 
@@ -59,6 +59,7 @@ http://localhost:5000
 ## Usage
 
 **1. base.html**
+
 Purpose:
 The base template provides a common layout and styling for all pages in the application. Other templates extend this base to keep consistent navigation, styling, and script loading.
 
@@ -98,6 +99,7 @@ The data is dynamically inserted using Jinja variables ({{ }}).
 This page gives users quick insight into the current state of the system.
 
 **3. policyholders.html**
+
 Purpose:
 Manage policyholders — register new ones and view existing entries.
 
@@ -112,6 +114,7 @@ Lists all policyholders with their details in a table.
 This page is for adding new policyholders and managing/viewing current ones.
 
 **4. claims.html**
+
 Purpose:
 Manage insurance claims — file new claims and view/update existing ones.
 
@@ -129,6 +132,7 @@ Inline JavaScript prompts the user for a new status and sends it via fetch to an
 This page helps users submit new claims and manage ongoing claims.
 
 **5. reports.html**
+
 Purpose:
 Show various aggregated reports on claims data.
 
@@ -149,6 +153,7 @@ Lists claims that are still pending.
 This page is for data analytics and understanding claim trends.
 
 **6. risk_analysis.html**
+
 Purpose:
 Analyze risk by identifying high-risk policyholders and breaking down claims by policy type.
 
