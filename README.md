@@ -78,6 +78,7 @@ Smooth UI:
 Using Bootstrap for responsive and clean UI.
 
 **2. index.html (Welcome page)**
+
 Purpose:
 Displays an overview dashboard showing key metrics for the application at a glance.
 
