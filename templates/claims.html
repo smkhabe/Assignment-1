@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Claim Management</h1>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>File New Claim</h3>
+        {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Policyholder</label>
+                <select class="form-select" name="policyholder_id" required>
+                    {% for ph in policyholders.values() %}
+                    <option value="{{ ph.id }}">{{ ph.name }} (ID: {{ ph.id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Claim Amount</label>
+                <input type="number" step="0.01" class="form-control" name="amount" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reason</label>
+                <textarea class="form-control" name="reason" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Claim</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h3>Existing Claims</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Policyholder</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td>{{ claim.id }}</td>
+                    <td>{{ policyholders[claim.policyholder_id].name }}</td>
+                    <td>{{ "%.2f"|format(claim.amount) }}</td>
+                    <td>{{ claim.date }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if claim.status == 'Approved' %}bg-success
+                            {% elif claim.status == 'Rejected' %}bg-danger
+                            {% else %}bg-warning{% endif %}">
+                            {{ claim.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary update-status" 
+                            data-claim-id="{{ claim.id }}">
+                            Update
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.update-status').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const claimId = this.getAttribute('data-claim-id');
+        const newStatus = prompt('Enter new status (Pending, Approved, Rejected):');
+        if (newStatus && ['Pending', 'Approved', 'Rejected'].includes(newStatus)) {
+            fetch(`/api/update-claim-status/${claimId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating claim: ' + data.error);
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+        

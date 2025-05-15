@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Welcome to Star Insurance Claim Management</h1>
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ policyholders|length }}</h5>
+                <p class="card-text">Policyholders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ claims|length }}</h5>
+                <p class="card-text">Total Claims</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ pending_claims }}</h5>
+                <p class="card-text">Pending Claims</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ high_risk_count }}</h5>
+                <p class="card-text">High Risk Policyholders</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+        
