@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Title -->
+<h1>Policyholder Management</h1>
+
+<div class="row mt-4">
+    <!-- Left Column: Registration Form -->
+    <div class="col-md-6">
+        <h3>Register New Policyholder</h3>
+
+        <!-- Display form validation errors -->
+        {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- New Policyholder Registration Form -->
+        <form method="POST">
+            <!-- Name input -->
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" required>
+            </div>
+
+            <!-- Age input -->
+            <div class="mb-3">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" name="age" required>
+            </div>
+
+            <!-- Policy Type dropdown -->
+            <div class="mb-3">
+                <label class="form-label">Policy Type</label>
+                <select class="form-select" name="policy_type" required>
+                    <option value="Health">Health</option>
+                    <option value="Vehicle">Vehicle</option>
+                    <option value="Life">Life</option>
+                </select>
+            </div>
+
+            <!-- Sum Insured input -->
+            <div class="mb-3">
+                <label class="form-label">Sum Insured</label>
+                <input type="number" step="0.01" class="form-control" name="sum_insured" required>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <!-- Right Column: Existing Policyholders Table -->
+    <div class="col-md-6">
+        <h3>Existing Policyholders</h3>
+
+        <!-- Table listing current policyholders -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Policy Type</th>
+                    <th>Sum Insured</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ph in policyholders %}
+                <tr>
+                    <td>{{ ph.id }}</td>
+                    <td>{{ ph.name }}</td>
+                    <td>{{ ph.age }}</td>
+                    <td>{{ ph.policy_type }}</td>
+                    <td>{{ "%.2f"|format(ph.sum_insured) }}</td>
+                    <td>
+                        <!-- Delete button -->
+                        <button class="btn btn-sm btn-outline-danger delete-policyholder" 
+                            data-policyholder-id="{{ ph.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JavaScript to handle policyholder deletion -->
+<script>
+document.querySelectorAll('.delete-policyholder').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const policyholderId = this.getAttribute('data-policyholder-id');
+        if (confirm('Are you sure you want to delete this policyholder? This will also delete all their associated claims.')) {
+            fetch(`/api/delete-policyholder/${policyholderId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the page to reflect the change
+                    location.reload();
+                } else {
+                    alert('Error deleting policyholder: ' + data.error);
+                }
+            });
+        }
+    });
+});
+</script>
+
+{% endblock %}

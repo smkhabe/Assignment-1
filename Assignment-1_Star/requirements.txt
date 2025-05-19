@@ -1,0 +1,6 @@
+Flask==3.0.0          # The main web framework — makes building web apps easier and faster
+Werkzeug==3.0.1       # Under-the-hood HTTP stuff Flask relies on (routing, requests, etc.)
+Jinja2==3.1.2         # Templating engine that Flask uses to render HTML with variables
+MarkupSafe==2.1.3     # Helps keep Jinja2 safe by escaping HTML to avoid security issues
+itsdangerous==2.1.2   # Keeps data secure when Flask signs cookies or tokens (security stuff)
+click==8.1.7          # Handy command line utility Flask uses for its CLI commands

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page title -->
+<h1>Risk Analysis</h1>
+
+<div class="row mt-4">
+
+    <!-- Left Column: High Risk Policyholders -->
+    <div class="col-md-6">
+        <h3>High Risk Policyholders</h3>
+        {% if high_risk %}
+        <!-- Table showing policyholders identified as high risk -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Claims (1yr)</th>
+                    <th>Claim Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hr in high_risk %}
+                <!-- Highlight rows in red to emphasize risk -->
+                <tr class="table-danger">
+                    <td>{{ hr.policyholder.id }}</td>
+                    <td>{{ hr.policyholder.name }}</td>
+                    <td>{{ hr.claim_frequency }}</td>
+                    <td>{{ "%.2f"|format(hr.claim_ratio * 100) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <!-- Message when no high risk policyholders found -->
+        <div class="alert alert-success">No high risk policyholders found</div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Claims grouped by Policy Type -->
+    <div class="col-md-6">
+        <h3>Claims by Policy Type</h3>
+
+        <!-- Loop through each policy type and show its claims -->
+        {% for policy_type, type_claims in claims_by_type.items() %}
+        <div class="card mb-3">
+            <div class="card-header">
+                {{ policy_type }} ({{ type_claims|length }} claims)
+            </div>
+            <div class="card-body">
+                <!-- Table listing individual claims for this policy type -->
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for claim in type_claims %}
+                        <tr>
+                            <td>{{ claim.id }}</td>
+                            <td>{{ "%.2f"|format(claim.amount) }}</td>
+                            <td>{{ claim.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

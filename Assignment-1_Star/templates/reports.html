@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Title -->
+<h1>Reports</h1>
+
+<div class="row mt-4">
+
+    <!-- Left Column: Monthly Claims & Averages -->
+    <div class="col-md-6">
+
+        <!-- Monthly Claims Table -->
+        <h3>Monthly Claims</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Claims</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, count in reports.monthly_claims.items() %}
+                <tr>
+                    <td>{{ month }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Average Claim by Policy Type -->
+        <h3 class="mt-4">Average Claim by Policy Type</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Policy Type</th>
+                    <th>Average Claim</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy_type, avg in reports.average_by_type.items() %}
+                <tr>
+                    <td>{{ policy_type }}</td>
+                    <td>{{ "%.2f"|format(avg) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Right Column: Highest Claim & Pending Claims -->
+    <div class="col-md-6">
+
+        <!-- Highest Claim Card -->
+        <h3>Highest Claim</h3>
+        {% if reports.highest_claim %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Claim #{{ reports.highest_claim.id }}</h5>
+                <p class="card-text">
+                    <strong>Policyholder:</strong>
+                    {{ policyholders[reports.highest_claim.policyholder_id].name }}<br>
+                    <strong>Amount:</strong> {{ "%.2f"|format(reports.highest_claim.amount) }}<br>
+                    <strong>Date:</strong> {{ reports.highest_claim.date }}<br>
+                    <strong>Status:</strong> {{ reports.highest_claim.status }}
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">No claims found</div>
+        {% endif %}
+
+        <!-- Pending Claims Table -->
+        <h3 class="mt-4">Pending Claims</h3>
+        {% if reports.pending_claims %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Policyholder</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in reports.pending_claims %}
+                <tr>
+                    <td>{{ claim.id }}</td>
+                    <td>{{ policyholders[claim.policyholder_id].name }}</td>
+                    <td>{{ "%.2f"|format(claim.amount) }}</td>
+                    <td>{{ claim.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-success">No pending claims</div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

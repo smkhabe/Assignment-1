@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<h1>Claim Management</h1>
+
+<div class="row mt-4">
+    <!-- Left column: Claim submission form -->
+    <div class="col-md-6">
+        <h3>File New Claim</h3>
+
+        <!-- Display validation errors, if any -->
+        {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- New claim form -->
+        <form method="POST">
+            <!-- Policyholder dropdown -->
+            <div class="mb-3">
+                <label class="form-label">Policyholder</label>
+                <select class="form-select" name="policyholder_id" required>
+                    {% for ph in policyholders.values() %}
+                    <option value="{{ ph.id }}">{{ ph.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Claim amount -->
+            <div class="mb-3">
+                <label class="form-label">Claim Amount</label>
+                <input type="number" step="0.01" class="form-control" name="amount" required>
+            </div>
+
+            <!-- Claim reason -->
+            <div class="mb-3">
+                <label class="form-label">Reason</label>
+                <textarea class="form-control" name="reason" required></textarea>
+            </div>
+
+            <!-- Claim status -->
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary">Submit Claim</button>
+        </form>
+    </div>
+
+    <!-- Right column: Claims table -->
+    <div class="col-md-6">
+        <h3>Existing Claims</h3>
+
+        <!-- Table showing all claims -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Policyholder</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td>{{ claim.id }}</td>
+                    <td>{{ policyholders[claim.policyholder_id].name }}</td>
+                    <td>{{ "%.2f"|format(claim.amount) }}</td>
+                    <td>{{ claim.date }}</td>
+                    <td>
+                        <!-- Color-coded status badge -->
+                        <span class="badge 
+                            {% if claim.status == 'Approved' %}bg-success
+                            {% elif claim.status == 'Rejected' %}bg-danger
+                            {% else %}bg-warning{% endif %}">
+                            {{ claim.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Button to trigger status update -->
+                        <button class="btn btn-sm btn-outline-primary update-status" 
+                            data-claim-id="{{ claim.id }}">
+                            Update
+                        </button>
+                        <!-- Delete button -->
+                        <button class="btn btn-sm btn-outline-danger delete-claim" 
+                            data-claim-id="{{ claim.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JavaScript to handle status updates and deletion via API -->
+<script>
+document.querySelectorAll('.update-status').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const claimId = this.getAttribute('data-claim-id');
+        const newStatus = prompt('Enter new status (Pending, Approved, Rejected):');
+
+        // Only proceed if valid status is provided
+        if (newStatus && ['Pending', 'Approved', 'Rejected'].includes(newStatus)) {
+            fetch(`/api/update-claim-status/${claimId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the page to reflect the change
+                    location.reload();
+                } else {
+                    alert('Error updating claim: ' + data.error);
+                }
+            });
+        }
+    });
+});
+
+// New delete claim code
+document.querySelectorAll('.delete-claim').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const claimId = this.getAttribute('data-claim-id');
+        if (confirm('Are you sure you want to delete this claim?')) {
+            fetch(`/api/delete-claim/${claimId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the page to reflect the change
+                    location.reload();
+                } else {
+                    alert('Error deleting claim: ' + data.error);
+                }
+            });
+        }
+    });
+});
+</script>
+
+{% endblock %}
